@@ -98,7 +98,7 @@
         // "moduleResolution": "node",  
 
         // baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响。
-        // "baseUrl": ".",  
+        "baseUrl": "assets/Script",  
 
         // paths用于设置模块名到基于baseUrl的路径映射
         // "paths": {
@@ -112,9 +112,11 @@
         // ], 
 
         // typeRoots用来指定声明文件或文件夹的路径列表，如果指定了此项，则只有在这里列出的声明文件才会被加载。
-        // "typeRoots": [],  
+        "typeRoots": [
+            "interface",
+        ],  
 
-        // types用来指定需要包含的模块，只有在这里列出的模块的声明文件才会被加载进来。
+        // types用来指定需要包含的模块，只有在这里列出的模块的声明文件才会被加载进来（指定typeRoots目录里的模块）。
         // "types": [],  
 
         // allowSyntheticDefaultImports的值为true或false，用来指定允许从没有默认导出的模块中默认导入。

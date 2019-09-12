@@ -12,11 +12,10 @@ export function test_import():void {
 }
 
 export function test_msgpack(): void {
-    cc.log(msgpack, new msgpack.Encoder, new msgpack.Decoder);
     var buffer = msgpack.encode({"foo": "bar"});
     var data = msgpack.decode(buffer);
+    cc.log(msgpack, new msgpack.Encoder, new msgpack.Decoder);
     cc.log(buffer, data);
-    
 }
 
 export default "hello world";
