@@ -100,10 +100,10 @@
         // baseUrl用于设置解析非相对模块名称的基本目录，相对模块不会受baseUrl的影响。
         "baseUrl": "assets/Script",  
 
-        // paths用于设置模块名到基于baseUrl的路径映射
-        // "paths": {
-        //   "*": ["node_modules/@types", "src/typings"]
-        // }, 
+        // paths用于设置模块名到基于baseUrl的路径映射（"*"： 表示名字不发生改变； "generated/*"表示模块名添加了“generated”前缀）
+        "paths": {
+            "@Debuger/*": ["../Debuger/*"]
+        }, 
 
         // rootDirs可以指定一个路径列表，在构建时编译器会将这个路径列表中的路径中的内容都放到一个文件夹中.
         // "rootDirs": [
