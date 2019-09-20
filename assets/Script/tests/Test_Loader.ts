@@ -68,7 +68,13 @@ function test_loadRes() {
     // 加载 test assets 目录下所有 SpriteFrame，并且获取它们的路径
     cc.loader.loadResDir("test assets", cc.SpriteFrame, function (err, assets, urls) { });
 
-    
+    cc.loader.addDownloadHandlers([])
+
+    // .pist 图集资源
+    cc.loader.loadRes("plist/effect_rule", cc.SpriteAtlas, function (err: Error, atlas: cc.SpriteAtlas) {
+        cc.log(atlas.getSpriteFrames());
+        // sprite.spriteFrame = atlas.getSpriteFrame('effect_rule_0001');
+    });
 }
 
 
