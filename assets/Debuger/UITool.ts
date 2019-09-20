@@ -71,6 +71,33 @@ function addMoveEvt(evtNode:cc.Node, moveNode:cc.Node = null, moveEvt:Function =
     }
 };
 
+function addTopTitle(title:string, node:cc.Node, parent:cc.Node, width:number, height:number, closeEvt:Function = null, moveEvt:Function = null, moveEndEvt:Function = null) {
+    var nodeTop = new cc.Node();
+    nodeTop.width = width;
+    nodeTop.height = 30;
+    nodeTop.x = 0;
+    nodeTop.y = (height + nodeTop.height) / 2;
+    nodeTop.parent = parent;
+    drawRect(nodeTop, nodeTop.width, nodeTop.height, COLOR_BG);
+    var txtTitle = newComText(16, nodeTop.width, nodeTop.height, COLOR_FONT);
+    txtTitle.string = title;
+    txtTitle.node.parent = nodeTop;
+    addMoveEvt(nodeTop, parent, moveEvt, moveEndEvt);
+    var nodeClose = new cc.Node();
+    nodeClose.width = 24;
+    nodeClose.height = 18;
+    nodeClose.x = (width - nodeClose.width - 8) / 2;
+    nodeClose.parent = nodeTop;
+    drawRect(nodeClose, nodeClose.width, nodeClose.height, COLOR_BTN);
+    var txtClose = newComText(16, nodeClose.width, nodeClose.height, COLOR_FONT);
+    txtClose.string = 'X';
+    txtClose.node.parent = nodeClose;
+    addBtnEvt(nodeClose, 1.05, null, () => {
+        closeEvt && closeEvt();
+        cc.isValid(node) && node.destroy();
+    });
+};
+
 function addBottomClose(node:cc.Node, parent:cc.Node, width:number, height:number, closeEvt:Function = null, moveEvt:Function = null, moveEndEvt:Function = null) {
     var nodeBottom = new cc.Node();
     nodeBottom.width = width;
@@ -167,10 +194,6 @@ export function newScrollView(nodeItem:cc.Node, width:number, height:number, row
 
 
 // 弹出选项列表
-// var list = [];
-// list.push({title: 'hello 1', callback: function() {cc.log('111322');}, });
-// list.push({title: 'hello 2', callback: function() {cc.log('111322');}, });
-// newListBtn(list);
 interface BtnItemData{ title: string, callback: Function }
 @ccclass class BtnItemNode extends DebugUIItem {
     _txtdesc:cc.Label
@@ -184,7 +207,11 @@ interface BtnItemData{ title: string, callback: Function }
         this._txtdesc.string = data && data.title || ('none_' + idx);
     }
 }
-export function newListBtn(list:BtnItemData[], isShowMask:boolean = true, width:number = 150, height:number = 155, closeEvt:Function = null) {
+// var list = [];
+// list.push({title: 'hello 1', callback: function() {cc.log('111322');}, });
+// list.push({title: 'hello 2', callback: function() {cc.log('111322');}, });
+// DEBUG.newListBtn("title", list);
+export function newListBtn(title:string, list:BtnItemData[], isShowMask:boolean = true, width:number = 150, height:number = 155, closeEvt:Function = null) {
     var nodeItem = new cc.Node();
     nodeItem.width = width - 10;
     nodeItem.height = 20;
@@ -194,7 +221,8 @@ export function newListBtn(list:BtnItemData[], isShowMask:boolean = true, width:
     scroll.node.parent = nodeMask;
     scroll.updateListData(list);
     drawRect(scroll.node, width, height + 6, COLOR_BG);
-    addBottomClose(nodeMask, scroll.node, width, height + 4, closeEvt);
+    addTopTitle(title, nodeMask, scroll.node, width, height + 4, closeEvt);
+    // addBottomClose(nodeMask, scroll.node, width, height + 4, closeEvt);
     return scroll;
 };
 
@@ -266,9 +294,7 @@ export function showDBAnimations(path: string, isMoveEffect: boolean = true, wid
     nodeEffect.height = height;
     nodeEffect.parent = nodeMask;
     drawRect(nodeEffect, width, height, COLOR_MASK, COLOR_BTN);
-    if (isMoveEffect) {
-        addMoveEvt(nodeEffect, nodeMask);
-    }
+    if (isMoveEffect) { addMoveEvt(nodeEffect, nodeMask); }
     var nodeDB = new cc.Node();
     var comDB = nodeDB.addComponent(dragonBones.ArmatureDisplay);
     nodeDB.parent = nodeEffect;
@@ -276,65 +302,57 @@ export function showDBAnimations(path: string, isMoveEffect: boolean = true, wid
     var txtDesc = newComText(18, width, 20, COLOR_BTN);
     txtDesc.node.y = (txtDesc.node.height - height) / 2;
     txtDesc.node.parent = nodeEffect;
-    function removeMask() {
-        cc.isValid(nodeMask) && nodeMask.destroy();
-    }
-    var listBtn1 = newListBtn([], false, 150, 155, removeMask);
-    var listBtn2 = newListBtn([], false);
-    listBtn1.node.x -= 2 + listBtn1.node.width / 2;
-    listBtn2.node.x += 2 + listBtn1.node.width / 2;
-    function onPlayAnimation(data) {
-        if (cc.isValid(comDB)) {
-            comDB.playTimes = -1;
-            comDB.animationName = data.title;
-            comDB.armatureName = data.armature;
-            cc.log(data)
-            if (cc.isValid(txtDesc)) {
-                var ret = comDB.armatureName + '  ' + data.title;
-                var cfg = comDB.armature().animation.animations[data.title];
-                if (cfg) ret += '  ' + cfg.frameCount;
-                txtDesc.string = ret;
-            }
-        }
-    }
-    function onInitList2(data) {
-        if (cc.isValid(comDB)) {
-            var listNames = comDB.getAnimationNames(data.title);
-            var listEvts = [];
-            for (var idx in listNames) {
-                listEvts.push({ title: listNames[idx], armature: data.title, callback: onPlayAnimation });
-            }
-            cc.isValid(listBtn1) && listBtn2.updateListData(listEvts);
-            listEvts.length > 0 && onPlayAnimation(listEvts[0]);
-            return;
-        }
-    }
-    function onInitList1(skeleton, texture) {
-        if (cc.isValid(comDB)) {
-            comDB.dragonAsset = null;
-            comDB.dragonAtlasAsset = texture;
-            comDB.dragonAsset = skeleton;
-            comDB.playTimes = -1;
-            comDB.armatureName = "default"; // 源码中，在_buildArmature中如果name为空，会直接return导致不进一步解析
-            var listNames = comDB.getArmatureNames();
-            var listEvts = [];
-            for (var idx in listNames) {
-                listEvts.push({ title: listNames[idx], callback: onInitList2 });
-            }
-            cc.isValid(listBtn1) && listBtn1.updateListData(listEvts);
-            listEvts.length > 0 && onInitList2(listEvts[0]);
-            return;
-        }
-        removeMask();
-    }
+    function removeMask() { cc.isValid(nodeMask) && nodeMask.destroy(); }
     cc.loader.loadRes(path + "/skeleton", dragonBones.DragonBonesAsset, (error: Error, skeleton: any) => {
-        if (error) return;
-        cc.loader.loadRes(path + "/texture", dragonBones.DragonBonesAtlasAsset, (error: Error, texture: any) => {
-            if (error) return;
-            onInitList1(skeleton, texture);
+        if (!error) cc.loader.loadRes(path + "/texture", dragonBones.DragonBonesAtlasAsset, (error: Error, texture: any) => {
+            if (!error) showDBArmatureList(comDB, skeleton, texture, removeMask);
         });
     });
 };
+function playDBAnimation(data:any) {
+    let comDB: dragonBones.ArmatureDisplay = data.comDB;
+    if (cc.isValid(comDB)) {
+        comDB.playTimes = -1;
+        comDB.animationName = data.title;
+        comDB.armatureName = data.armature;
+        let txtDesc: cc.Label = data.txt;
+        if (cc.isValid(txtDesc)) {
+            var ret = comDB.armatureName + '  ' + data.title;
+            var cfg = comDB.armature().animation.animations[data.title];
+            if (cfg) ret += '  ' + cfg.frameCount;
+            txtDesc.string = ret;
+        }
+    }
+}
+function showDBAnimationList(data:any) {
+    let comDB: dragonBones.ArmatureDisplay = data.comDB;
+    if (cc.isValid(comDB)) {
+        var listNames = comDB.getAnimationNames(data.title);
+        var listEvts = [];
+        for (var idx in listNames) { listEvts.push({ title: listNames[idx], armature: data.title, callback: playDBAnimation }); }
+        listEvts.length > 0 && playDBAnimation(listEvts[0]);
+        var listBtn = newListBtn("动作列表", [], false);
+        listBtn.node.x += 2 + listBtn.node.width / 2;
+        return;
+    }
+}
+function showDBArmatureList(comDB: dragonBones.ArmatureDisplay, skeleton: dragonBones.DragonBonesAsset, texture: dragonBones.DragonBonesAtlasAsset, removeMask:Function) {
+    if (cc.isValid(comDB)) {
+        comDB.dragonAsset = null;
+        comDB.dragonAtlasAsset = texture;
+        comDB.dragonAsset = skeleton;
+        comDB.playTimes = -1;
+        comDB.armatureName = "default"; // 源码中，在_buildArmature中如果name为空，会直接return导致不进一步解析
+        var listNames = comDB.getArmatureNames();
+        var listEvts = [];
+        for (var idx in listNames) { listEvts.push({ title: listNames[idx], comDB:comDB, callback: showDBAnimationList }); }
+        listEvts.length > 0 && showDBAnimationList(listEvts[0]);
+        var listBtn = newListBtn("龙骨列表", [], false, 150, 155, removeMask);
+        listBtn.node.x -= 2 + listBtn.node.width / 2;
+        return;
+    }
+    removeMask();
+}
 
 // 可旋转和移动的图片
 // DEBUG.showImg('hello/HelloWorld');
