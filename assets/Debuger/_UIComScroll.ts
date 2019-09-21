@@ -1,6 +1,6 @@
 const { ccclass, property } = cc._decorator;
 
-import DebugUIItem from './UICompItem'
+import DebugUIItem from './_UICompItem'
 
 @ccclass
 export default class DebugUIScroll extends cc.Component {

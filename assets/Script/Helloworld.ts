@@ -1,7 +1,9 @@
 const {ccclass, property} = cc._decorator;
 
 import * as test from './tests/Test_import'
-import * as DEBUG from '@Debuger/UITool'
+import * as UITool from '@Debuger/UITool'
+import * as ImgTool from '@Debuger/ImgTool'
+import * as EffTool from '@Debuger/EffTool'
 
 @ccclass
 export default class Helloworld extends cc.Component {
@@ -19,8 +21,9 @@ export default class Helloworld extends cc.Component {
         test.test_msgpack();
 
 
-        // DEBUG.showDBAnimations('dragonbones/eff', false);
-        // DEBUG.showImg('hello/HelloWorld');
+        // UITool.showDBAnimations('dragonbones/eff', false);
+        // UITool.showImg('hello/HelloWorld');
+        EffTool.playFrameEff("plist/effect_rule", (node:cc.Node)=>node.destroy()).parent = this.node;
     }
 
 }
