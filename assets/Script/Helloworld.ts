@@ -1,9 +1,9 @@
 const {ccclass, property} = cc._decorator;
 
 import * as test from './tests/Test_import'
-import * as UITool from '@Debuger/UITool'
-import * as ImgTool from '@Debuger/ImgTool'
-import * as EffTool from '@Debuger/EffTool'
+import * as UITool from '@Debuger/_UITool'
+import * as ImgTool from '@Debuger/_ImgTool'
+import * as EffTool from '@Debuger/_EffTool'
 
 @ccclass
 export default class Helloworld extends cc.Component {

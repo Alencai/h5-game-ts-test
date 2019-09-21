@@ -1,8 +1,8 @@
 const { ccclass, property } = cc._decorator;
 
-import DebugUIScroll from './UIComScroll'
-import DebugUIItem from './UICompItem'
-import * as ImgTool from './ImgTool'
+import DebugUIScroll from './_UIComScroll'
+import DebugUIItem from './_UICompItem'
+import * as ImgTool from './_ImgTool'
 
 
 const COLOR_BG = new cc.Color(230, 240, 240, 210);
